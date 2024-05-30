@@ -1,0 +1,2 @@
+- include_tasks: deploy_wordpress.yml
+- include_tasks: install_wp_cli.yml

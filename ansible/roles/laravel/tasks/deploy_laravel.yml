@@ -1,0 +1,58 @@
+- name: Check if {{ project_folder }} folder exist
+  stat:
+    path: "/home/{{ username }}/public_html/{{ project_name }}"
+  register: project_folder
+  tags: laravel
+
+- name: Clone a private repository into {{ project_name }} folder.
+  become: false
+  git:
+    repo: "{{ git_repo }}"
+    version: "{{ git_branch }}"
+    dest: "/home/{{ username }}/public_html/{{ project_name }}"
+    accept_hostkey: yes
+    when: not project_folder.state.exist
+  tags: laravel
+
+- name: Chang Folder Owner
+  become: true
+  command: chown -R {{ username }}:{{ username }} /home/{{ username }}/public_html
+  when: project_folder.state.exist
+  tags: laravel
+
+- name: Install laravel dependencies
+  command:
+    chdir: "/home/{{ username }}/public_html/{{ project_name }}"
+    cmd: "composer update"
+  become: true
+  become_user: "{{ username }}"
+  when: project_folder.state.exist
+  tags: laravel
+
+- name: Copy env file
+  template:
+    src: env.j2
+    dest: /home/{{ username }}/public_html/{{ project_name }}/.env
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: "0644"
+  become: true
+  when: project_folder.state.exist
+  tags: laravel
+
+- name: Setup laravel
+  shell: |
+    cd /home/{{ username }}/public_html/
+    php artisan key:generate
+  become: true
+  when: project_folder.state.exist
+  tags: laravel
+
+- name: Add htaccess
+  become: true
+  copy:
+    owner: "{{ username }}"
+    src: "htaccess.txt"
+    dest: "/home/{{ username }}/public_html/{{ project_name }}/.htaccess"
+  when: project_folder.state.exist
+  tags: laravel

@@ -1,0 +1,40 @@
+- name: Install laravel
+  become: true
+  become_user: "{{ username }}"
+  command:
+    chdir: "/home/{{ username }}/public_html"
+    cmd: "composer create-project laravel/laravel ."
+  tags: laravel
+
+- name: Install laravel dependencies
+  command:
+    chdir: "/home/{{ username }}/public_html"
+    cmd: "composer update"
+  become: true
+  become_user: "{{ username }}"
+  tags: laravel
+
+- name: Copy env file
+  template:
+    src: env.j2
+    dest: /home/{{ username }}/public_html/.env
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: "0644"
+  become: true
+  tags: laravel
+
+- name: Setup laravel
+  shell: |
+    cd /home/{{ username }}/public_html
+    php artisan key:generate
+  become: true
+  tags: laravel
+
+- name: Add htaccess
+  become: true
+  copy:
+    owner: "{{ username }}"
+    src: "htaccess.txt"
+    dest: "/home/{{ username }}/public_html/public/.htaccess"
+  tags: laravel

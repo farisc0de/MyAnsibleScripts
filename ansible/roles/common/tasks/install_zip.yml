@@ -1,0 +1,12 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  tags: common
+
+- name: Install Zip & Unzip
+  apt:
+    name:
+      - zip
+      - unzip
+    state: latest
+  tags: common

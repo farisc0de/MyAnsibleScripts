@@ -1,0 +1,2 @@
+- include_tasks: install_composer.yml
+- include_tasks: deploy_laravel.yml

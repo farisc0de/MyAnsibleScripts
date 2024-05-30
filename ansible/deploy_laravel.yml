@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - "{{ hostname }}.yml"
+    - "vault/{{ hostname }}.yml"
+  roles:
+    - common
+    - laravel

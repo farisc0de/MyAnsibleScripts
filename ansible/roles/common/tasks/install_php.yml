@@ -1,0 +1,34 @@
+- name: Install PHP
+  block:
+    - apt_repository:
+        validate_certs: no
+        repo: "ppa:ondrej/php"
+        state: present
+
+    - apt:
+        update_cache: yes
+
+    - apt:
+        name: php-fpm
+        state: latest
+
+    - apt:
+        name:
+          - "php-curl"
+          - "php-gd"
+          - "php-mbstring"
+          - "php-xml"
+          - "php-xmlrpc"
+          - "php-soap"
+          - "php-intl"
+          - "php-zip"
+          - "php-mysql"
+          - "php-imagick"
+        state: latest
+
+    - command: "a2enconf php{{ php_version }}-fpm"
+      notify: restart_apache
+
+  tags:
+    - common
+    - upgrade_php

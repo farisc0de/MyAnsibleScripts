@@ -1,0 +1,16 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  tags: common
+
+- name: Install ACL
+  apt:
+    name: acl
+    state: latest
+  tags: common
+
+- name: Install Git
+  apt:
+    name: git
+    state: latest
+  tags: common

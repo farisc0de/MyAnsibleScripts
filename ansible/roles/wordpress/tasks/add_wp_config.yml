@@ -1,0 +1,9 @@
+- name: Add WP-Config
+  become: true
+  become_user: "{{ username }}"
+  template:
+    src: "wp-config.php.j2"
+    dest: "/home/{{ username }}/public_html/{{ project_name }}/public/wp-config.php"
+    owner: "{{ username }}"
+  when: project_folder.state.exist
+  tags: wordpress

@@ -1,0 +1,79 @@
+<IfModule mod_headers.c>
+    Header unset X-Powered-By
+    Header unset Server
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "no-referrer-when-downgrade"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+    Header always set Content-Security-Policy "frame-ancestors 'self';"
+</IfModule>
+
+# STRONG HTACCESS PROTECTION</code>
+<Files ~ "^.*\.([Hh][Tt][Aa])">
+    order allow,deny
+    deny from all
+</Files>
+
+# BEGIN Deny Access to readme.html
+<Files readme.html>
+    order allow,deny
+    deny from all
+</Files>
+# END Deny Access to readme.html
+
+# protect wp-config.php
+<files wp-config.php>
+    Order deny,allow
+    Deny from all
+</files>
+
+## Leverage Browser Caching in WordPress via .htaccess ##
+<IfModule mod_expires.c>
+    FileETag MTime Size
+    AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/xml application/xhtml+xml application/rss+xml application/javascript application/x-javascript/>    
+    ExpiresActive On
+    ExpiresByType text/html "access 600 seconds"
+    ExpiresByType application/xhtml+xml "access 600 seconds"
+    ExpiresByType text/css "access 1 day"
+    ExpiresByType text/javascript "access 1 day"
+    ExpiresByType text/x-javascript "access 1 day"
+    ExpiresByType application/javascript "access 1 day"
+    ExpiresByType application/x-javascript "access 1 day"
+    ExpiresByType application/x-shockwave-flash "access 1 day"
+    ExpiresByType application/pdf "access 1 day"
+    ExpiresByType image/x-icon "access 1 day"
+    ExpiresByType image/jpg "access 1 day"
+    ExpiresByType image/jpeg "access 1 day"
+    ExpiresByType image/png "access 1 day"
+    ExpiresByType image/gif "access 1 day"
+</IfModule>
+
+<Files xmlrpc.php>
+    Order Deny,Allow
+    Deny from all
+    Allow from 127.0.0.1
+    Allow from 192.0.64.0/18
+    ErrorDocument 403 http://127.0.0.1/
+</Files>
+
+<files wp-cron.php>
+    Order allow,deny
+    Deny from all
+</files>
+
+<files robots.txt>
+    Order allow,deny
+    Deny from all
+</files>
+
+# BEGIN WordPress
+
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+
+# END WordPress

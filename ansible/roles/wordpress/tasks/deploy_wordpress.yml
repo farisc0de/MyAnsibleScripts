@@ -1,0 +1,40 @@
+- name: Check if {{ project_name }} folder exist
+  stat:
+    path: "/home/{{ username }}/public_html/{{ project_name }}"
+  register: project_folder
+  tags: wordpress
+
+- name: Clone a private repository into {{ project_name }} folder.
+  become: true
+  become_user: "{{ username }}"
+  git:
+    repo: "{{ git_repo }}"
+    version: "{{ git_branch }}"
+    dest: "/home/{{ username }}/public_html/{{ project_name }}"
+    accept_hostkey: yes
+  when: not project_folder.stat.exists
+  tags: wordpress
+
+- name: Change Folder Owner
+  become: true
+  command: chown -R {{ username }}:{{ username }} /home/{{ username }}/public_html
+  when: project_folder.stat.exists
+  tags: wordpress
+
+- name: Add WP-Config
+  become: true
+  template:
+    src: "wp-config.php.j2"
+    dest: "/home/{{ username }}/public_html/{{ project_name }}/public/wp-config.php"
+    owner: "{{ username }}"
+  when: project_folder.stat.exists
+  tags: wordpress
+
+- name: Add htaccess
+  become: true
+  copy:
+    owner: "{{ username }}"
+    src: "htaccess.txt"
+    dest: "/home/{{ username }}/public_html/{{ project_name }}/public/.htaccess"
+  when: project_folder.stat.exists
+  tags: wordpress
