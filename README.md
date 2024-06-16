@@ -24,14 +24,14 @@ This repository contains Ansible playbooks for automating the deployment of vari
 ## TODO
 
 - [x] Replace mpm_prefork with mpm_event
-- [-] Add NodeJS support
-- [-] Optimize Apache configuration
-- [-] Optimize MySQL configuration
-- [-] Optimize PHP configuration
-- [-] Optimize Nginx configuration
-- [-] Optimize Redis configuration
-- [-] Add Caching by default to apache
-- [-] SSH Hardening
+- [ ] Add NodeJS support
+- [ ] Optimize Apache configuration
+- [ ] Optimize MySQL configuration
+- [ ] Optimize PHP configuration
+- [ ] Optimize Nginx configuration
+- [ ] Optimize Redis configuration
+- [ ] Add Caching by default to apache
+- [ ] SSH Hardening
 - [x] Firewall Hardening
-- [-] Perfomance Optimization for Apache
-- [-] Add mod_security to Apache configuration
+- [ ] Perfomance Optimization for Apache
+- [ ] Add mod_security to Apache configuration
