@@ -1,5 +1,6 @@
 ---
 # tasks file for apache
 - include_tasks: install_apache.yml
+- include_tasks: enable_mod_security.yml
 - include_tasks: create_vhost.yml
 - include_tasks: rewrite_mpm_event.yml
