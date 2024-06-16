@@ -34,4 +34,4 @@ This repository contains Ansible playbooks for automating the deployment of vari
 - [ ] SSH Hardening
 - [x] Firewall Hardening
 - [ ] Perfomance Optimization for Apache
-- [ ] Add mod_security to Apache configuration
+- [x] Add mod_security to Apache configuration
