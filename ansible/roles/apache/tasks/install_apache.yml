@@ -1,0 +1,41 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  tags: apache
+
+- name: Install Apache
+  apt:
+    name: apache2
+    state: latest
+  tags: apache
+
+- name: Install libapache2-mod-fcgid
+  apt:
+    name: libapache2-mod-fcgid
+    state: latest
+  tags: apache
+
+- name: Disable mpm_worker & mpm_prefork
+  community.general.apache2_module:
+    state: absent
+    name: "{{ item }}"
+    warn_mpm_absent: false
+    ignore_configcheck: true
+  loop:
+    - mpm_prefork
+    - mpm_worker
+  notify: restart_apache
+  tags: apache
+
+- name: Enable needed packages
+  community.general.apache2_module:
+    state: present
+    name: "{{ item }}"
+  loop:
+    - mpm_event
+    - proxy_fcgi
+    - setenvif
+    - rewrite
+    - headers
+  notify: restart_apache
+  tags: apache

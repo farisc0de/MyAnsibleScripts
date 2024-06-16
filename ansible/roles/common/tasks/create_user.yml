@@ -8,28 +8,9 @@
   tags: common
 
 - name: Add user to sudoers
-  lineinfile:
-    dest: /etc/sudoers.d/{{ username }}
-    create: true
-    line: "{{ username }} ALL=(ALL) NOPASSWD: ALL"
-    validate: visudo -cf %s
-  tags: common
-
-- name: Create a VirtualHost
-  template:
-    src: vhost.conf.j2
-    dest: /etc/apache2/sites-available/{{ username }}.conf
-  notify:
-    - restart_apache
-  tags: common
-
-- name: Enable the VirtualHost
-  file:
-    src: /etc/apache2/sites-available/{{ username }}.conf
-    dest: /etc/apache2/sites-enabled/{{ username }}.conf
-    state: link
-  notify:
-    - restart_apache
+  community.general.sudoers:
+    user: "{{ username }}"
+    commands: ALL
   tags: common
 
 - name: Create a DocumentRoot
@@ -48,19 +29,4 @@
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: 0755
-  tags: common
-
-- name: Create Run folder
-  become: true
-  file:
-    path: /run/php/8.2
-    state: directory
-  tags: common
-
-- name: Create PHP-FPM pool
-  template:
-    src: pool.conf.j2
-    dest: /etc/php/8.2/fpm/pool.d/{{ username }}.conf
-  notify:
-    - restart_php
   tags: common

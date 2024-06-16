@@ -1,9 +1,13 @@
 ---
 - hosts: all
-  become: true
+  vars:
+    - application_type: "wordpress"
   vars_files:
     - "{{ hostname }}.yml"
     - "vault/{{ hostname }}.yml"
   roles:
     - common
+    - securitybaseline
+    - apache
+    - php
     - wordpress

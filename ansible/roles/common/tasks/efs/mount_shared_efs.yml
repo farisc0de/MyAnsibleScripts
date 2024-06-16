@@ -1,0 +1,16 @@
+- name: Create directory
+  become: true
+  file:
+    path: /{{ env }}-webdir/{{ username }}
+    state: directory
+
+- name: add {{ username }} entry to /etc/fstab
+  become: true
+  mount:
+    fstype: nfs
+    opts: defaults
+    dump: 0
+    passno: 0
+    state: mounted
+    src: "{{ efs_source }}"
+    path: "/{{ env }}-webdir/{{ username }}"

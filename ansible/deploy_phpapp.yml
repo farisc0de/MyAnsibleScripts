@@ -1,9 +1,13 @@
 ---
 - hosts: all
-  become: true
+  vars:
+    - application_type: "phpapp"
   vars_files:
     - "{{ hostname }}.yml"
     - "vault/{{ hostname }}.yml"
   roles:
     - common
+    - securitybaseline
+    - apache
     - php
+    - phpapp

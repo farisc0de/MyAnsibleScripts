@@ -1,0 +1,33 @@
+---
+# tasks file for nginx
+- name: Install nginx
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+  tags: nginx
+
+- name: Create a VirtualHost
+  template:
+    src: default.j2
+    dest: /etc/nginx/sites-available/{{ username }}
+  notify:
+    - restart_nginx
+  tags: nginx
+
+- name: Enable the VirtualHost
+  file:
+    src: /etc/nginx/sites-available/{{ username }}
+    dest: /etc/nginx/sites-enabled/{{ username }}
+    state: link
+  notify:
+    - restart_nginx
+  tags: nginx
+
+- name: Disable the default VirtualHost
+  file:
+    - name: "/etc/nginx/sites-enabled/default"
+    - state: absent
+  notify:
+    - restart_nginx
+  tags: nginx

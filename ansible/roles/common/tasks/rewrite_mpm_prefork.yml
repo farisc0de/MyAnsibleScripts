@@ -1,7 +1,0 @@
-- name: Rewrite MPM_Prefork
-  become: true
-  copy:
-    src: "mpm_prefork.conf"
-    dest: "/etc/apache2/mods-available/mpm_prefork.conf"
-  notify: restart_apache
-  tags: common

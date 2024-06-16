@@ -15,11 +15,14 @@
   when: not project_folder.stat.exists
   tags: wordpress
 
-- name: Change Folder Owner
-  become: true
-  command: chown -R {{ username }}:{{ username }} /home/{{ username }}/public_html
-  when: project_folder.stat.exists
-  tags: wordpress
+- name: change Folder Owner
+  file:
+    path: /home/{{ username }}/public_html
+    state: directory
+    recurse: yes
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  tags: laravel
 
 - name: Add WP-Config
   become: true

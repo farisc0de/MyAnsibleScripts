@@ -1,9 +1,13 @@
 ---
 - hosts: all
-  become: true
+  vars:
+    - application_type: "laravel"
   vars_files:
     - "{{ hostname }}.yml"
     - "vault/{{ hostname }}.yml"
   roles:
     - common
+    - securitybaseline
+    - apache
+    - php
     - laravel

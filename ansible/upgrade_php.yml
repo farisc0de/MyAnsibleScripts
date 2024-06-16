@@ -1,9 +1,0 @@
----
-- hosts: all
-  become: true
-  vars:
-
-  tasks:
-    import_role:
-      name: "common"
-      tasks_from: "install_php"

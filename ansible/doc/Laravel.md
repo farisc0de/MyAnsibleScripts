@@ -1,11 +1,11 @@
 # Laravel - Ansible
 
-**Step 1: Create Variable File**
+## Step 1: Create Variable File
 
 - **Location:** Place your variable file in the `/vars` directory.
-- **Naming:** Name the file after your hostname, for example `davos.ansible.yml`.
+- **Naming:** Name the file after your hostname, for example `innovaox.yml`.
 
-**Step 2: Populate the Variable File**
+## Step 2: Populate the Variable File
 
 - Add the following configurations to your variable file. Adjust the values as necessary for your environment:
 
@@ -30,7 +30,7 @@ git_repo: "git@yourgitrepo.com:exampleuser/exampleproject.git"
 git_branch: "main"
 ```
 
-### Explanation of Each Field:
+### Explanation of Each Field
 
 - **username**: The username for system or application use.
 - **groupname**: The group associated with the username.
@@ -51,7 +51,7 @@ git_branch: "main"
 
 Adjust these placeholder values to fit the specifics of your actual configuration.
 
-**Step 4: Populate the Vault File**
+## Step 4: Populate the Vault File
 
 - Include sensitive data such as API tokens and database passwords. Update as necessary:
 
@@ -60,33 +60,33 @@ token: "your_token_here"
 db_password: "your_db_password_here"
 ```
 
-**Step 5: Encrypt the Vault**
+## Step 5: Encrypt the Vault
 
 - Encrypt your vault file to secure the sensitive data using the following command:
 
 ```bash
-ansible-vault encrypt {hostname}.ansible.yml
+ansible-vault encrypt {hostname}.yml
 ```
 
 - Replace `{hostname}` with the actual hostname of your vault file.
 
-**Step 6: Deploy Using Ansible**
+## Step 6: Deploy Using Ansible
 
 - Push your changes to your version control system.
 - From your Infrastructure as Code (IaC) server, run the Ansible playbook with the following command:
 
 ```bash
-ansible-playbook deploy_laravel.ansible.yml --ask-vault-pass --extra-vars="hostname={hostname} -i inventory --limit {ip_address}"
+ansible-playbook deploy_laravel.yml --ask-vault-pass --extra-vars="hostname={hostname} -i inventory --limit {ip_address}"
 ```
 
 - Replace `{hostname}` with the actual hostname you are working with.
 - Replace `{ip_address}` with the server you want execute the playbook on.
 
-**Step 7: Verification**
+## Step 7: Verification
 
 - Verify the deployment by accessing your Laravel site through its domain name to ensure all configurations are applied correctly.
 
-### Additional Tips:
+### Additional Tips
 
 - **Version Control**: Always ensure you're not pushing the unencrypted vault files to your Git repository.
 - **Variable Management**: Consider using dynamic variables for environments where hostname or other parameters might change frequently.

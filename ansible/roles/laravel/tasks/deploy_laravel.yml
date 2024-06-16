@@ -14,19 +14,22 @@
     when: not project_folder.state.exist
   tags: laravel
 
-- name: Chang Folder Owner
-  become: true
-  command: chown -R {{ username }}:{{ username }} /home/{{ username }}/public_html
+- name: change Folder Owner
+  file:
+    path: /home/{{ username }}/public_html
+    state: directory
+    recurse: yes
+    owner: "{{ username }}"
+    group: "{{ username }}"
   when: project_folder.state.exist
   tags: laravel
 
 - name: Install laravel dependencies
-  command:
-    chdir: "/home/{{ username }}/public_html/{{ project_name }}"
-    cmd: "composer update"
+  community.general.composer:
+    command: install
+    working_dir: "/home/{{ username }}/public_html/{{ project_name }}"
   become: true
   become_user: "{{ username }}"
-  when: project_folder.state.exist
   tags: laravel
 
 - name: Copy env file
@@ -41,9 +44,9 @@
   tags: laravel
 
 - name: Setup laravel
-  shell: |
-    cd /home/{{ username }}/public_html/
-    php artisan key:generate
+  command: php artisan key:generate
+  args:
+    chdir: "/home/{{ username }}/public_html/{{ project_name }}"
   become: true
   when: project_folder.state.exist
   tags: laravel

@@ -7,8 +7,8 @@
         dest: /tmp/composer-setup.php
 
     - name: Run Composer Installer (if not already installed)
-      command:
-        cmd: /usr/bin/php /tmp/composer-setup.php
+      command: /usr/bin/php /tmp/composer-setup.php
+      args:
         creates: composer.phar
 
     - name: Copy Composer Executable to /usr/local/bin

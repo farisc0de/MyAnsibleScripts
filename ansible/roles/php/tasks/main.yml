@@ -1,1 +1,63 @@
-- include_tasks: deploy_php.yml
+---
+# tasks file for php
+- name: Install PHP
+  block:
+    - apt_repository:
+        validate_certs: no
+        repo: "ppa:ondrej/php"
+        state: present
+
+    - apt:
+        name: php-fpm
+        state: "{{ php_version }}"
+        update_cache: yes
+
+    - apt:
+        name: "{{ item }}"
+        state: "{{ php_version }}"
+      loop:
+        - "php-curl"
+        - "php-gd"
+        - "php-mbstring"
+        - "php-xml"
+        - "php-xmlrpc"
+        - "php-soap"
+        - "php-intl"
+        - "php-zip"
+        - "php-mysql"
+        - "php-imagick"
+
+    - command: "a2enconf php{{ php_version }}-fpm"
+      notify: restart_apache
+
+    - name: Create PHP-FPM pool
+      template:
+        src: pool.conf.j2
+        dest: /etc/php/{{ php_version }}/fpm/pool.d/{{ username }}.conf
+      notify:
+        - restart_php
+
+- name: Configure fpm/php.ini file
+  lineinfile:
+    path: "/etc/php/{{ php_version }}/fpm/php.ini"
+    regexp: "{{ item.parameter }} ="
+    line: "{{ item.parameter }} = {{ item.value }}"
+    backup: yes
+  with_items:
+    - parameter: post_max_size
+      value: "{{ post_max_size }}"
+    - parameter: upload_max_filesize
+      value: "{{ upload_max_filesize }}"
+    - parameter: max_execution_time
+      value: "{{ max_execution_time }}"
+    - parameter: max_input_time
+      value: "{{ max_input_time }}"
+    - parameter: memory_limit
+      value: "{{ memory_limit }}"
+  notify:
+    - restart_php
+    - restart_apache
+
+  tags:
+    - php
+    - upgrade_php

@@ -1,0 +1,42 @@
+<VirtualHost *:80>
+    ServerName {{ domainName }}
+    ServerAlias {{ domainAlias }}
+    DocumentRoot /home/{{ username }}/public_html/{{ project_name }}/public
+
+    ServerSignature Off
+
+    <Directory /home/{{ username }}/public_html/{{ project_name }}/public>
+        Options FollowSymLinks
+        AllowOverride Limit Options FileInfo
+        DirectoryIndex index.php
+        Require all granted
+    </Directory>
+
+    {% if application_type == wordpress %}
+
+    <Directory /home/{{ username }}/public_html/{{ project_name }}/public/wp-content>
+        Options FollowSymLinks
+        Require all granted
+    </Directory>
+
+    {% endif %}
+
+    <FilesMatch ".+\.ph(ar|p|tml)$">
+        {% if php_version == 8.0 %}
+            SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php80.localhost"
+        {% elif php_version == 8.1 %}
+            SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php81.localhost"
+        {% elif php_version == 8.2 %}
+            SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php82.localhost"
+        {% elif php_version == 8.3 %}
+            SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php83.localhost"
+        {% endif %}
+    </FilesMatch>
+
+    <IfModule mod_setenvif.c>
+        SetEnvIf X-Forwarded-Proto "^https$" HTTPS
+    </IfModule>
+
+    ErrorLog /home/{{ username }}/apache_logs/error.log
+    CustomLog /home/{{ username }}/apache_logs/access.log combined
+</VirtualHost>

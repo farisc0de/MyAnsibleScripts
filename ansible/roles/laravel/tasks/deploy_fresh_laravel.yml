@@ -1,15 +1,16 @@
 - name: Install laravel
+  community.general.composer:
+    command: create-project
+    arguments: laravel/laravel {{ project_name }}
+    working_dir: /home/{{ username }}/public_html
+    prefer_dist: true
   become: true
   become_user: "{{ username }}"
-  command:
-    chdir: "/home/{{ username }}/public_html"
-    cmd: "composer create-project laravel/laravel ."
-  tags: laravel
 
 - name: Install laravel dependencies
-  command:
-    chdir: "/home/{{ username }}/public_html"
-    cmd: "composer update"
+  community.general.composer:
+    command: install
+    working_dir: "/home/{{ username }}/public_html/{{ project_name }}"
   become: true
   become_user: "{{ username }}"
   tags: laravel
@@ -17,7 +18,7 @@
 - name: Copy env file
   template:
     src: env.j2
-    dest: /home/{{ username }}/public_html/.env
+    dest: /home/{{ username }}/public_html/{{ project_name }}/.env
     owner: "{{ username }}"
     group: "{{ username }}"
     mode: "0644"
@@ -25,9 +26,9 @@
   tags: laravel
 
 - name: Setup laravel
-  shell: |
-    cd /home/{{ username }}/public_html
-    php artisan key:generate
+  command: php artisan key:generate
+  args:
+    chdir: "/home/{{ username }}/public_html/{{ project_name }}"
   become: true
   tags: laravel
 
@@ -36,5 +37,5 @@
   copy:
     owner: "{{ username }}"
     src: "htaccess.txt"
-    dest: "/home/{{ username }}/public_html/public/.htaccess"
+    dest: "/home/{{ username }}/public_html/public/{{ project_name }}/.htaccess"
   tags: laravel

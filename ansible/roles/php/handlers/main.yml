@@ -1,27 +1,8 @@
-- name: restart_apache
-  tags: apache,debian,httpd
-  service:
-    name: apache2
-    state: restarted
-  listen: "restart_apache"
-
-- name: restart_nginx
-  tags: apache,debian,httpd
-  service:
-    name: nginx
-    state: restarted
-  listen: "restart_nginx"
-
+---
+# handlers file for php
 - name: restart_php
   tags: php,debian
   service:
-    name: php8.2-fpm
+    name: php{{ php_version }}-fpm
     state: restarted
   listen: "restart_php"
-
-- name: restart_redis
-  tags: php,debian
-  service:
-    name: redis-server
-    state: restarted
-  listen: "restart_redis"

@@ -1,0 +1,8 @@
+---
+# handlers file for redis
+- name: restart_redis
+  tags: redis,debian
+  service:
+    name: redis-server
+    state: restarted
+  listen: "restart_redis"

@@ -1,0 +1,6 @@
+- name: Update a VirtualHost
+  template:
+    src: vhost.conf.j2
+    dest: /etc/apache2/sites-available/{{ username }}.conf
+  notify: restart_apache
+  tags: apache

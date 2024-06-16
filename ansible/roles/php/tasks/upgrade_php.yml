@@ -1,0 +1,27 @@
+---
+- name: "Add PHP repo"
+  apt_repository:
+      validate_certs: no
+      repo: "ppa:ondrej/php"
+      state: present
+
+- name: "Install the latest PHP-FPM"
+  apt:
+      name: php-fpm
+      state: latest
+      update_cache: yes
+
+- name: "Install the latest PHP packages"
+  apt:
+      name:
+          - "php-curl"
+          - "php-gd"
+          - "php-mbstring"
+          - "php-xml"
+          - "php-xmlrpc"
+          - "php-soap"
+          - "php-intl"
+          - "php-zip"
+          - "php-mysql"
+          - "php-imagick"
+      state: latest
