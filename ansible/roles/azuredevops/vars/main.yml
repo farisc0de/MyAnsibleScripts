@@ -1,0 +1,8 @@
+---
+# vars file for azuredevops
+azuredevops_organization_name: innovaox
+azuredevops_orgnization_url: https://dev.azure.com/{{ azuredevops_organization_name }}
+azuredevops_agent_version: 3.241.0
+azuredevops_agent_download_url: >
+  https://vstsagentpackage.azureedge.net/agent/{{ azuredevops_agent_version }}/vsts-agent-linux-x64-{{ azuredevops_agent_version }}.tar.gz
+azuredevops_agent_installation_directory: /home/{{ agent_user }}/azagent

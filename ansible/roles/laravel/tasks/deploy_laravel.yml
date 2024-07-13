@@ -1,24 +1,25 @@
-- name: Check if {{ project_folder }} folder exist
-  stat:
-    path: "/home/{{ username }}/public_html/{{ project_name }}"
+---
+- name: Check if folder exist {{ project_folder }}
+  ansible.builtin.stat:
+    path: /home/{{ username }}/public_html/{{ project_name }}
   register: project_folder
   tags: laravel
 
-- name: Clone a private repository into {{ project_name }} folder.
+- name: Clone a private repository into {{ project_name }}.
   become: false
-  git:
+  ansible.builtin.git:
     repo: "{{ git_repo }}"
     version: "{{ git_branch }}"
-    dest: "/home/{{ username }}/public_html/{{ project_name }}"
-    accept_hostkey: yes
-    when: not project_folder.state.exist
+    dest: /home/{{ username }}/public_html/{{ project_name }}
+    accept_hostkey: true
+  when: not project_folder.state.exist
   tags: laravel
 
-- name: change Folder Owner
-  file:
+- name: Change Folder Owner
+  ansible.builtin.file:
     path: /home/{{ username }}/public_html
     state: directory
-    recurse: yes
+    recurse: true
     owner: "{{ username }}"
     group: "{{ username }}"
   when: project_folder.state.exist
@@ -27,13 +28,13 @@
 - name: Install laravel dependencies
   community.general.composer:
     command: install
-    working_dir: "/home/{{ username }}/public_html/{{ project_name }}"
+    working_dir: /home/{{ username }}/public_html/{{ project_name }}
   become: true
   become_user: "{{ username }}"
   tags: laravel
 
 - name: Copy env file
-  template:
+  ansible.builtin.template:
     src: env.j2
     dest: /home/{{ username }}/public_html/{{ project_name }}/.env
     owner: "{{ username }}"
@@ -44,18 +45,21 @@
   tags: laravel
 
 - name: Setup laravel
-  command: php artisan key:generate
+  ansible.builtin.command: php artisan key:generate
   args:
-    chdir: "/home/{{ username }}/public_html/{{ project_name }}"
+    chdir: /home/{{ username }}/public_html/{{ project_name }}
   become: true
   when: project_folder.state.exist
+  changed_when: my_output.rc != 0
   tags: laravel
 
 - name: Add htaccess
   become: true
-  copy:
+  ansible.builtin.copy:
     owner: "{{ username }}"
-    src: "htaccess.txt"
-    dest: "/home/{{ username }}/public_html/{{ project_name }}/.htaccess"
+    src: htaccess.txt
+    dest: /home/{{ username }}/public_html/{{ project_name }}/.htaccess
+    mode: "0644"
   when: project_folder.state.exist
+  changed_when: my_output.rc != 0
   tags: laravel

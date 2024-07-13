@@ -1,7 +1,0 @@
-- name: Rewrite MPM_Event
-  become: true
-  template:
-    src: "mpm_event.conf.j2"
-    dest: "/etc/apache2/mods-available/mpm_event.conf"
-  notify: restart_apache
-  tags: apache

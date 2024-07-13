@@ -61,6 +61,8 @@ define( 'SECURE_AUTH_SALT', '{{ lookup('password', '/dev/null chars=ascii_letter
 define( 'LOGGED_IN_SALT',   '{{ lookup('password', '/dev/null chars=ascii_letters length=64') }}' );
 define( 'NONCE_SALT',       '{{ lookup('password', '/dev/null chars=ascii_letters length=64') }}' );
 
+define('WP_AUTO_UPDATE_CORE', false);
+
 /**#@-*/
 
 /**

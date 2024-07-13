@@ -1,3 +1,4 @@
+---
 - name: Install laravel
   community.general.composer:
     command: create-project
@@ -10,13 +11,13 @@
 - name: Install laravel dependencies
   community.general.composer:
     command: install
-    working_dir: "/home/{{ username }}/public_html/{{ project_name }}"
+    working_dir: /home/{{ username }}/public_html/{{ project_name }}
   become: true
   become_user: "{{ username }}"
   tags: laravel
 
 - name: Copy env file
-  template:
+  ansible.builtin.template:
     src: env.j2
     dest: /home/{{ username }}/public_html/{{ project_name }}/.env
     owner: "{{ username }}"
@@ -26,16 +27,19 @@
   tags: laravel
 
 - name: Setup laravel
-  command: php artisan key:generate
+  ansible.builtin.command: php artisan key:generate
+  register: my_output
+  changed_when: my_output.rc != 0
   args:
-    chdir: "/home/{{ username }}/public_html/{{ project_name }}"
+    chdir: /home/{{ username }}/public_html/{{ project_name }}
   become: true
   tags: laravel
 
 - name: Add htaccess
   become: true
-  copy:
+  ansible.builtin.copy:
     owner: "{{ username }}"
-    src: "htaccess.txt"
-    dest: "/home/{{ username }}/public_html/public/{{ project_name }}/.htaccess"
+    src: htaccess.txt
+    dest: /home/{{ username }}/public_html/public/{{ project_name }}/.htaccess
+    mode: preserve
   tags: laravel

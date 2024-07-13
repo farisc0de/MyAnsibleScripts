@@ -1,43 +1,39 @@
-- name: Check if {{ project_name }} folder exist
-  stat:
-    path: "/home/{{ username }}/public_html/{{ project_name }}"
+---
+- name: Check if folder exist {{ project_name }}
+  ansible.builtin.stat:
+    path: "{{ apache_root_path }}/{{ project_name }}"
   register: project_folder
   tags: wordpress
 
-- name: Clone a private repository into {{ project_name }} folder.
+- name: Clone a private repository into {{ project_name }}.
   become: true
   become_user: "{{ username }}"
-  git:
+  ansible.builtin.git:
     repo: "{{ git_repo }}"
     version: "{{ git_branch }}"
-    dest: "/home/{{ username }}/public_html/{{ project_name }}"
-    accept_hostkey: yes
+    dest: "{{ apache_root_path }}/{{ project_name }}"
+    accept_hostkey: true
   when: not project_folder.stat.exists
   tags: wordpress
 
-- name: change Folder Owner
-  file:
-    path: /home/{{ username }}/public_html
+- name: Change Folder Owner
+  ansible.builtin.file:
+    path: "{{ apache_root_path }}"
     state: directory
-    recurse: yes
+    recurse: true
     owner: "{{ username }}"
     group: "{{ username }}"
   tags: laravel
 
 - name: Add WP-Config
-  become: true
-  template:
-    src: "wp-config.php.j2"
-    dest: "/home/{{ username }}/public_html/{{ project_name }}/public/wp-config.php"
-    owner: "{{ username }}"
-  when: project_folder.stat.exists
-  tags: wordpress
+  ansible.builtin.import_tasks: add_wp_config.yml
 
 - name: Add htaccess
   become: true
-  copy:
+  ansible.builtin.copy:
     owner: "{{ username }}"
-    src: "htaccess.txt"
-    dest: "/home/{{ username }}/public_html/{{ project_name }}/public/.htaccess"
+    src: htaccess.txt
+    dest: "{{ apache_root_path }}/{{ project_name }}/public/.htaccess"
+    mode: "0644"
   when: project_folder.stat.exists
   tags: wordpress

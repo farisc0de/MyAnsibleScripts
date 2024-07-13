@@ -1,6 +1,0 @@
-- name: Update PHP-FPM pool
-  template:
-    src: pool.conf.j2
-    dest: /etc/php/{{ php_version }}/fpm/pool.d/{{ username }}.conf
-  notify:
-    - restart_php

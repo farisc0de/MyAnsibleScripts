@@ -1,0 +1,10 @@
+---
+- name: Uninstall the Agent
+  become: true
+  become_user: "{{ agent_user }}"
+  become_method: ansible.builtin.sudo
+  azure_devops:
+    action: uninstall
+    agent_user: "{{ agent_user }}"
+    agent_installation_directory: "{{ azuredevops_agent_installation_directory }}"
+  tags: azuredevops

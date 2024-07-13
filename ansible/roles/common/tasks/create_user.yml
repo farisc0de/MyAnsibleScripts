@@ -1,5 +1,6 @@
+---
 - name: Create a user
-  user:
+  ansible.builtin.user:
     name: "{{ username }}"
     append: true
     generate_ssh_key: true
@@ -9,24 +10,25 @@
 
 - name: Add user to sudoers
   community.general.sudoers:
+    name: "{{ username }}"
     user: "{{ username }}"
     commands: ALL
   tags: common
 
 - name: Create a DocumentRoot
-  file:
+  ansible.builtin.file:
     path: /home/{{ username }}/public_html
     state: directory
     owner: "{{ username }}"
     group: "{{ username }}"
-    mode: 0755
+    mode: "0755"
   tags: common
 
 - name: Create a apache_logs folder
-  file:
+  ansible.builtin.file:
     path: /home/{{ username }}/apache_logs
     state: directory
     owner: "{{ username }}"
     group: "{{ username }}"
-    mode: 0755
+    mode: "0755"
   tags: common

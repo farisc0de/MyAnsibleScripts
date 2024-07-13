@@ -1,33 +1,34 @@
 ---
 - name: Install Composer if its not already installed
+  tags:
+    - laravel
+    - composer
   block:
     - name: Download Composer Installation Script (if not already installed)
-      get_url:
+      ansible.builtin.get_url:
         url: https://getcomposer.org/installer
         dest: /tmp/composer-setup.php
+        mode: "+x"
 
     - name: Run Composer Installer (if not already installed)
-      command: /usr/bin/php /tmp/composer-setup.php
+      ansible.builtin.command: /usr/bin/php /tmp/composer-setup.php
       args:
         creates: composer.phar
 
     - name: Copy Composer Executable to /usr/local/bin
       become: true
-      copy:
+      ansible.builtin.copy:
         src: composer.phar
         dest: /usr/local/bin/composer
-        remote_src: yes
+        remote_src: true
         mode: "0755"
 
     - name: Remove phar
-      file:
+      ansible.builtin.file:
         path: composer.phar
         state: absent
 
     - name: Remove Install Script
-      file:
+      ansible.builtin.file:
         path: /tmp/composer-setup.php
         state: absent
-  tags:
-    - laravel
-    - composer

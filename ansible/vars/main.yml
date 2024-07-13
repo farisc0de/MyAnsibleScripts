@@ -1,0 +1,36 @@
+---
+# Apache
+
+apache_root_path: /home/{{ username }}/public_html
+apache_logs_path: /home/{{ username }}/apache_logs
+
+# PHP
+
+php_version: 8.3
+
+post_max_size: "256M"
+upload_max_filesize: "25M"
+file_uploads: "On"
+max_execution_time: 90
+max_input_time: 90
+max_file_uploads: 20
+memory_limit: "128M"
+disable_functions: [exec, passthru, shell_exec, system]
+allow_url_fopen: "off"
+
+# Azure DevOps Agent
+
+agent_user: "{{ username }}"
+agent_work_directory: _work
+agent_version: 3.241.0
+
+# MPM
+
+apache_extra_mpm: event
+apache_extra_threadlimit: 2800
+apache_extra_startservers: 4
+apache_extra_minsparethreads: 25
+apache_extra_maxsparethreads: 75
+apache_extra_threadsperchild: 500
+apache_extra_maxrequestworkers: 2800
+apache_extra_maxconnectionsperchild: 1000

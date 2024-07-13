@@ -1,15 +1,18 @@
+---
 - name: Allow connections on port 80
   become: true
-  iptables:
+  ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
     destination_port: 80
-    state: NEW
+    ctstate: NEW
     jump: ACCEPT
-    insert_before: 6
+    state: present
   tags: common
+  register: output
 
-- name: "Make the table persistent"
+- name: Make the table persistent
   become: true
-  command: "netfilter-persistent save"
+  ansible.builtin.command: netfilter-persistent save
   tags: common
+  changed_when: my_output.rc != 0

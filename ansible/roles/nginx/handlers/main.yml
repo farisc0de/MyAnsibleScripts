@@ -1,8 +1,0 @@
----
-# handlers file for nginx
-- name: restart_nginx
-  tags: apache,debian,httpd
-  service:
-    name: nginx
-    state: restarted
-  listen: "restart_nginx"

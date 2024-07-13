@@ -1,6 +1,0 @@
-- name: Delete a VirtualHost
-  file:
-    path: "/etc/apache2/sites-available/{{ username }}.conf"
-    state: absent
-  notify: restart_apache
-  tags: apache

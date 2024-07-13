@@ -1,7 +1,0 @@
-- name: Add WP-Config
-  become: true
-  template:
-    src: "wp-config.php.j2"
-    dest: "/{{ env }}-webdir/{{ username }}/public_html/{{ project_name }}/public/wp-config.php"
-    owner: "{{ username }}"
-  tags: wordpress

@@ -1,0 +1,4 @@
+---
+# tasks file for azuredevops
+- name: Azure DevOps
+  ansible.builtin.include_tasks: install_azagent.yml

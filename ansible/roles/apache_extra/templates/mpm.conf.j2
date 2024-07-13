@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+ServerLimit {{ apache_extra_serverlimit }}
+{% if ansible_distribution_major_version|int > 6 %}
+MaxRequestWorkers {{ apache_extra_maxrequestworkers }}
+{% else %}
+MaxClients {{ apache_extra_maxrequestworkers }}
+{% endif %}
+StartServers {{ apache_extra_startservers }}
+{% if ansible_distribution_major_version|int > 6 %}
+MaxConnectionsPerChild {{ apache_extra_maxconnectionsperchild }}
+{% else %}
+MaxRequestsPerChild {{ apache_extra_maxconnectionsperchild }}
+{% endif %}
+{% if apache_extra_mpm == 'worker' or apache_extra_mpm == 'event' %}
+ThreadLimit {{ apache_extra_threadlimit }}
+ThreadsPerChild {{ apache_extra_threadsperchild }}
+MinSpareThreads {{ apache_extra_minsparethreads }}
+MaxSpareThreads {{ apache_extra_maxsparethreads }}
+{% else %}
+MinSpareServers {{ apache_extra_minspareservers }}
+MaxSpareServers {{ apache_extra_maxspareservers }}
+{% endif %}

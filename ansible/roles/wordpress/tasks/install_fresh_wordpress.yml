@@ -1,0 +1,69 @@
+---
+# WordPress Configuration
+- name: Check if folder exist {{ project_name }}
+  ansible.builtin.stat:
+    path: "{{ apache_root_path }}/{{ project_name }}"
+  register: project_folder
+  tags: wordpress
+
+- name: Clone a private repository into {{ project_name }}.
+  become: true
+  become_user: "{{ username }}"
+  ansible.builtin.git:
+    repo: "{{ git_repo }}"
+    version: "{{ git_branch }}"
+    dest: "{{ apache_root_path }}/{{ project_name }}"
+    accept_hostkey: true
+  when: not project_folder.stat.exists
+  tags: wordpress
+
+- name: Download and unpack latest WordPress
+  ansible.builtin.unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: "{{ apache_root_path }}/{{ project_name }}"
+    remote_src: true
+    creates: "{{ apache_root_path }}/{{ project_name }}/wordpress"
+  tags: wordpress
+
+- name: Rename WordPress to public
+  ansible.builtin.file:
+    src: "{{ apache_root_path }}/{{ project_name }}/wordpress"
+    dest: "{{ apache_root_path }}/{{ project_name }}/public"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: "0755"
+  tags: wordpress
+
+- name: Set ownership
+  ansible.builtin.file:
+    path: "{{ apache_root_path }}/{{ project_name }}"
+    state: directory
+    recurse: true
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  tags: wordpress
+
+- name: Set permissions for directories
+  ansible.builtin.file:
+    path: "{{ apache_root_path }}/{{ project_name }}/public/"
+    state: directory
+    mode: "0750"
+    recurse: true
+  tags: wordpress
+
+- name: Set permissions for files
+  ansible.builtin.file:
+    path: "{{ apache_root_path }}/{{ project_name }}/public/"
+    state: file
+    mode: "0640"
+    recurse: true
+  tags: wordpress
+
+- name: Set up wp-config
+  ansible.builtin.copy:
+    src: "{{ apache_root_path }}/{{ project_name }}/public/wp-config-sample.php"
+    dest: "{{ apache_root_path }}/{{ project_name }}/public/wp-config.php"
+    remote_src: true
+    mode: "0644"
+  tags: wordpress

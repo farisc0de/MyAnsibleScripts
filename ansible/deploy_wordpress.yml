@@ -1,13 +1,190 @@
 ---
-- hosts: all
-  vars:
-    - application_type: "wordpress"
+- name: Deploy WordPress
+  hosts: all
   vars_files:
-    - "{{ hostname }}.yml"
-    - "vault/{{ hostname }}.yml"
+    - vars/main.yml
+
+  vars_prompt:
+    # Environment
+    - name: "env"
+      prompt: "Enter the environment"
+      private: false
+
+    # Linux user
+    - name: "username"
+      prompt: "Enter the username"
+      private: false
+
+    - name: "groupname"
+      prompt: "Enter the groupname"
+      private: false
+
+    # Virtual host
+    - name: "domainname"
+      prompt: "Enter the domainname"
+      private: false
+
+    - name: "domainalias"
+      prompt: "Enter the domainalias"
+      private: false
+
+    # Database
+    - name: "db_host"
+      prompt: "Enter the database host"
+      private: false
+
+    - name: "db_name"
+      prompt: "Enter the database name"
+      private: false
+
+    - name: "db_user"
+      prompt: "Enter the database user"
+      private: false
+
+    - name: "db_password"
+      prompt: "Enter the database password"
+      private: true
+
+    # Project Repo
+    - name: "project_name"
+      prompt: "Enter the project name"
+      private: false
+
+    - name: "git_repo"
+      prompt: "Enter the git repository"
+      private: false
+
+    - name: "git_branch"
+      prompt: "Enter the git branch"
+      private: false
+
+    # Azure DevOps
+    - name: "agent_name"
+      prompt: "Enter Azure DevOps the agent name"
+      private: false
+
+    - name: "agent_token"
+      prompt: "Enter the agent token"
+      private: true
+
+    - name: "agent_deployment_group_name"
+      prompt: "Enter the agent deployment group name"
+      private: false
+
+    - name: "agenet_deployment_group_project_name"
+      prompt: "Enter the agent deployment group project name"
+      private: false
+
+  vars:
+    application_type: "wordpress"
+
+    php_default_version_debian: "{{ php_version }}"
+
+    php_packages_extra:
+      - php-zip
+
+    php_enable_php_fpm: true
+
+    php_fpm_state: started
+
+    php_fpm_enabled_on_boot: true
+
+    php_fpm_pools:
+      - pool_name: "{{ username }}"
+        php_fpm_pool_user: "{{ username }}"
+        php_fpm_pool_group: "{{ username }}"
+        pool_listen: "/run/php/{{ username }}.sock"
+        pool_listen_allowed_clients: "127.0.0.1"
+        pool_pm: dynamic
+        pool_pm_max_children: 5
+        pool_pm_start_servers: 2
+        pool_pm_min_spare_servers: 1
+        pool_pm_max_spare_servers: 3
+        pool_pm_max_requests: 500
+
+    php_use_managed_ini: true
+
+    php_memory_limit: "{{ memory_limit }}"
+    php_max_execution_time: "{{ max_execution_time }}"
+    php_file_uploads: "{{ file_uploads }}"
+    php_upload_max_filesize: "{{ upload_max_filesize }}"
+    php_max_file_uploads: "{{ max_file_uploads }}"
+    php_post_max_size: "{{ post_max_size }}"
+    php_allow_url_fopen: "{{ allow_url_fopen }}"
+    php_disable_functions: "{{ disable_functions }}"
+
+    apache_vhosts:
+      - servername: "{{ domainname }}"
+        serveralias: "{{ domainalias }}"
+        documentroot: "{{ apache_root_path }}/{{ project_name }}/public"
+        extra_parameters: |
+          <Directory {{ apache_root_path }}/{{ project_name }}/public>
+            Options FollowSymLinks
+            AllowOverride Limit Options FileInfo
+            DirectoryIndex index.php
+            Require all granted
+          </Directory>
+
+          <Directory {{ apache_root_path }}/{{ project_name }}/public/wp-content>
+            Options FollowSymLinks
+            Require all granted
+          </Directory>
+
+          <FilesMatch ".+\.ph(ar|p|tml)$">
+              {% if php_version == 8.0 %}
+                  SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php80.localhost"
+              {% elif php_version == 8.1 %}
+                  SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php81.localhost"
+              {% elif php_version == 8.2 %}
+                  SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php82.localhost"
+              {% elif php_version == 8.3 %}
+                  SetHandler "proxy:unix:/run/php/{{ username }}.sock|fcgi://php83.localhost"
+              {% endif %}
+          </FilesMatch>
+
+          <IfModule mod_setenvif.c>
+              SetEnvIf X-Forwarded-Proto "^https$" HTTPS
+          </IfModule>
+
+          ErrorLog {{ apache_logs_path }}/error.log
+          CustomLog {{ apache_logs_path }}/access.log combined
+
+    apache_mods_enabled:
+      - mpm_event
+      - proxy_fcgi
+      - setenvif
+      - rewrite
+      - headers
+      - security2
+
+    apache_mods_disabled:
+      - mpm_prefork
+      - mpm_worker
+
+    apache_packages:
+      - [platform-specific]
+      - libapache2-mod-security2
+
+    logrotate_scripts:
+      - name: "{{ username }}"
+        path: "/home/{{ username }}/wordpress_logs/*.log"
+        options:
+          - daily
+          - missingok
+          - rotate 3
+          - compress
+          - delaycompress
+          - notifempty
+          - create 666 {{ username }} {{ username }}
+
   roles:
     - common
-    - securitybaseline
-    - apache
-    - php
+    - devsec.hardening.os_hardening
+    - devsec.hardening.ssh_hardening
+    - geerlingguy.apache
+    - geerlingguy.php-versions
+    - geerlingguy.php
+    - apache_extra
+    - azuredevops
     - wordpress
+    - logrotate

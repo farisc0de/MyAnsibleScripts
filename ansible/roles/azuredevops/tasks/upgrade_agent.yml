@@ -1,0 +1,21 @@
+---
+- name: Upgrade Azure Agent
+  become: true
+  become_user: "{{ agent_user }}"
+  become_method: ansible.builtin.sudo
+  azure_devops:
+    action: upgrade
+    agent_download_url: "{{ azuredevops_agent_download_url }}"
+    agent_user: "{{ agent_user }}"
+    agent_installation_directory: "{{ azuredevops_agent_installation_directory }}"
+    organization_name: "{{ azuredevops_organization_name }}"
+    orgnization_url: "{{ azuredevops_orgnization_url }}"
+    agent_name: "{{ agent_name }}"
+    agent_token: "{{ agent_token }}"
+    agent_work_directory: "{{ agent_work_directory }}"
+    agent_version: "{{ azuredevops_agent_version }}"
+    agent_deployment_group_name: "{{ agent_deployment_group_name }}"
+    agenet_deployment_group_project_name: "{{ agenet_deployment_group_project_name }}"
+  register: upgrade_result
+  failed_when: upgrade_result.rc != 0
+  tags: azuredevops

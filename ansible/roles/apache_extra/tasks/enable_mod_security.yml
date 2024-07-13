@@ -1,0 +1,77 @@
+---
+- name: Enable Mod-Security Recommended Settings
+  ansible.builtin.copy:
+    src: /etc/modsecurity/modsecurity.conf-recommended
+    dest: /etc/modsecurity/modsecurity.conf
+    remote_src: true
+    mode: "0644"
+  notify: restart_apache
+  tags: apache
+
+- name: Update the Settings
+  ansible.builtin.replace:
+    path: /etc/modsecurity/modsecurity.conf
+    regexp: "{{ item.old }}"
+    replace: "{{ item.new }}"
+    backup: true
+  loop:
+    - old: SecRuleEngine DetectionOnly
+      new: SecRuleEngine On
+    - old: SecAuditLogParts ABDEFHIJZ
+      new: SecAuditLogParts ABCEFHJKZ
+  notify: restart_apache
+  tags: apache
+
+- name: Download OWASP Filter
+  become: true
+  become_user: "{{ username }}"
+  ansible.builtin.get_url:
+    url: https://github.com/coreruleset/coreruleset/archive/refs/tags/v{{ apache_extra_crs_version }}.zip
+    dest: /home/{{ username }}/coreruleset-{{ apache_extra_crs_version }}.zip
+    mode: "0644"
+  tags: apache
+
+- name: Extract the latest filter
+  become: true
+  become_user: "{{ username }}"
+  ansible.builtin.unarchive:
+    src: /home/{{ username }}/coreruleset-{{ apache_extra_crs_version }}.zip
+    dest: /home/{{ username }}/coreruleset-{{ apache_extra_crs_version }}
+    remote_src: true
+  failed_when: false
+  tags: apache
+
+- name: Create CRS directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/apache2/modsecurity-crs/
+    state: directory
+    mode: "0755"
+  tags: apache
+
+- name: Copy OWAS Filter to CRS directory
+  ansible.builtin.copy:
+    src: /home/{{ username }}/coreruleset-{{ apache_extra_crs_version }}
+    dest: /etc/apache2/modsecurity-crs/
+    remote_src: true
+    mode: "0755"
+  tags: apache
+
+- name: Enable OWASP Filter
+  ansible.builtin.copy:
+    src: /etc/apache2/modsecurity-crs/coreruleset-{{ apache_extra_crs_version }}/crs-setup.conf.example
+    dest: /etc/apache2/modsecurity-crs/coreruleset-{{ apache_extra_crs_version }}/crs-setup.conf
+    remote_src: true
+    mode: "0644"
+  tags: apache
+
+- name: Activate OWASP Filter
+  ansible.builtin.replace:
+    path: /etc/apache2/mods-enabled/security2.conf
+    regexp: IncludeOptional /usr/share/modsecurity-crs/*.load
+    replace: |-
+      IncludeOptional /etc/apache2/modsecurity-crs/coreruleset-{{ apache_extra_crs_version }}/crs-setup.conf
+      IncludeOptional /etc/apache2/modsecurity-crs/coreruleset-{{ apache_extra_crs_version }}/rules/*.conf
+    backup: true
+  notify: restart_apache
+  tags: apache

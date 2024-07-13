@@ -1,8 +1,0 @@
----
-# handlers file for php
-- name: restart_php
-  tags: php,debian
-  service:
-    name: php{{ php_version }}-fpm
-    state: restarted
-  listen: "restart_php"

@@ -1,7 +1,0 @@
----
-# handlers file for securitybaseline
-
-- name: reboot_host
-  reboot:
-    reboot_timeout: 360
-  listen: "reboot_host"

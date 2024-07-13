@@ -1,16 +1,20 @@
+---
 - name: Create directory
   become: true
-  file:
+  ansible.builtin.file:
     path: /{{ env }}-webdir/{{ username }}
     state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: "0755"
 
-- name: add {{ username }} entry to /etc/fstab
+- name: Add entry to /etc/fstab
   become: true
-  mount:
+  ansible.posix.mount:
     fstype: nfs
     opts: defaults
     dump: 0
     passno: 0
     state: mounted
     src: "{{ efs_source }}"
-    path: "/{{ env }}-webdir/{{ username }}"
+    path: /{{ env }}-webdir/{{ username }}

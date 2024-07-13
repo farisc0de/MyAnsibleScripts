@@ -1,6 +1,6 @@
 <VirtualHost *:80>
-    ServerName {{ domainName }}
-    ServerAlias {{ domainAlias }}
+    ServerName {{ domainname }}
+    ServerAlias {{ domainalias }}
     DocumentRoot /{{ env }}-webdir/{{ username }}/public_html/{{ project_name }}/public
     AssignUserId {{ username }} {{ groupname }}
 

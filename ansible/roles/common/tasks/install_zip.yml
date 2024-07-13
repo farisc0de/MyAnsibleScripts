@@ -1,12 +1,13 @@
+---
 - name: Update apt cache
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
   tags: common
 
 - name: Install Zip & Unzip
-  apt:
+  ansible.builtin.apt:
     name:
       - zip
       - unzip
-    state: latest
+    state: present
   tags: common
