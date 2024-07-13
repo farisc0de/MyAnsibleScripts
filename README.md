@@ -10,28 +10,18 @@ This repository contains Ansible playbooks for automating the deployment of vari
 - **Performance**: Optimize server performance for various applications and services.
 - **Auditing**: Ensure compliance with security standards and best practices.
 - **Apache**: Configure Apache web server for optimal performance and security.
-- **Nginx**: Configure Nginx web server for optimal performance and security.
-- **MySQL**: Configure MySQL database server for optimal performance and security.
-- **PHP**: Configure PHP for optimal performance and security.
 
-## Prerequisites
+## Components
 
 - **Ansible**: Install Ansible on your local machine or server.
-- **Inventory**: Create an Ansible inventory file with the IP addresses of your servers.
+- **Inventory**: Dynamic inventory is used for managing hosts.
 - **SSH Keys**: Ensure SSH keys are set up for passwordless authentication.
-- **Vault**: Use Ansible Vault to encrypt sensitive data in your playbooks.
+- **Prompts**: Ansible Variables are prompted for during playbook execution.
+- **Roles**: Ansible roles are used for organizing tasks and variables.
+- **Playbooks**: Ansible playbooks are used for executing tasks on hosts.
+- **Handlers**: Ansible handlers are used for restarting services.
+- **Templates**: Jinja2 templates are used for generating configuration files.
 
-## TODO
+## License
 
-- [x] Replace mpm_prefork with mpm_event
-- [ ] Add NodeJS support
-- [ ] Optimize Apache configuration
-- [ ] Optimize MySQL configuration
-- [ ] Optimize PHP configuration
-- [ ] Optimize Nginx configuration
-- [ ] Optimize Redis configuration
-- [ ] Add Caching by default to apache
-- [ ] SSH Hardening
-- [x] Firewall Hardening
-- [ ] Perfomance Optimization for Apache
-- [x] Add mod_security to Apache configuration
+MIT
