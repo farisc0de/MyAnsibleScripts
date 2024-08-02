@@ -1,14 +1,8 @@
 ---
-- name: Deploy Laravel
+- name: Deploy WordPress
   hosts: all
-  vars_files:
-    - vars/main.yml
-
   vars_prompt:
-    - name: "env"
-      prompt: "Enter the environment"
-      private: false
-
+    # Linux user
     - name: "username"
       prompt: "Enter the username"
       private: false
@@ -17,6 +11,7 @@
       prompt: "Enter the groupname"
       private: false
 
+    # Virtual host
     - name: "domainname"
       prompt: "Enter the domainname"
       private: false
@@ -25,22 +20,50 @@
       prompt: "Enter the domainalias"
       private: false
 
-    - name: "db_host"
+    # Database
+    - name: "laravel_db_host"
       prompt: "Enter the database host"
       private: false
 
-    - name: "db_name"
+    - name: "laravel_db_name"
       prompt: "Enter the database name"
       private: false
 
-    - name: "db_user"
+    - name: "laravel_db_user"
       prompt: "Enter the database user"
       private: false
 
-    - name: "db_password"
+    - name: "laravel_db_password"
       prompt: "Enter the database password"
       private: true
 
+    - name: "laravel_smtp_host"
+      prompt: "Enter the smtp host"
+      private: false
+
+    - name: "laravel_smtp_port"
+      prompt: "Enter the smtp port"
+      private: false
+      default: "587"
+
+    - name: "laravel_smtp_username"
+      prompt: "Enter the smtp username"
+      private: false
+
+    - name: "laravel_smtp_password"
+      prompt: "Enter the smtp password"
+      private: true
+
+    - name: "laravel_smtp_encryption"
+      prompt: "Enter the smtp encryption"
+      private: false
+      default: "tls"
+
+    - name: "laravel_smtp_from_address"
+      prompt: "Enter the smtp from address"
+      private: false
+
+    # Project Repo
     - name: "project_name"
       prompt: "Enter the project name"
       private: false
@@ -53,35 +76,32 @@
       prompt: "Enter the git branch"
       private: false
 
-    - name: "agent_name"
+    # Azure DevOps
+    - name: "my_az_devops_agent_name"
       prompt: "Enter Azure DevOps the agent name"
       private: false
 
-    - name: "agent_token"
+    - name: "az_devops_accesstoken"
       prompt: "Enter the agent token"
       private: true
 
-    - name: "agent_deployment_group_name"
+    - name: "az_devops_deployment_group_name"
       prompt: "Enter the agent deployment group name"
       private: false
 
-    - name: "agenet_deployment_group_project_name"
+    - name: "az_devops_project_name"
       prompt: "Enter the agent deployment group project name"
       private: false
 
-  vars:
-    application_type: "laravel"
+  vars_files:
+    - vars/apache.yml
+    - vars/php.yml
+    - vars/app.yml
 
+  vars:
     php_default_version_debian: "{{ php_version }}"
 
-    php_packages_extra:
-      - php-zip
-
     php_enable_php_fpm: true
-
-    php_fpm_state: started
-
-    php_fpm_enabled_on_boot: true
 
     php_fpm_pools:
       - pool_name: "{{ username }}"
@@ -96,28 +116,19 @@
         pool_pm_max_spare_servers: 3
         pool_pm_max_requests: 500
 
-    php_use_managed_ini: true
+    apache_global_vhost_settings: ""
 
-    php_memory_limit: "{{ memory_limit }}"
-    php_max_execution_time: "{{ max_execution_time }}"
-    php_file_uploads: "{{ file_uploads }}"
-    php_upload_max_filesize: "{{ upload_max_filesize }}"
-    php_max_file_uploads: "{{ max_file_uploads }}"
-    php_post_max_size: "{{ post_max_size }}"
-    php_allow_url_fopen: "{{ allow_url_fopen }}"
-    php_disable_functions: "{{ disable_functions }}"
+    apache_vhosts_filename: "{{ username }}.conf"
 
     apache_vhosts:
       - servername: "{{ domainname }}"
         serveralias: "{{ domainalias }}"
-        documentroot: "/home/{{ username }}/public_html/{{ project_name }}"
+        documentroot: "{{ apache_root_path }}/{{ project_name }}/public"
+        apache_allow_override: "All"
+        apache_options: "FollowSymLinks"
+
         extra_parameters: |
-          <Directory /home/{{ username }}/public_html/{{ project_name }}/public>
-            Options FollowSymLinks
-            AllowOverride Limit Options FileInfo
-            DirectoryIndex index.php
-            Require all granted
-          </Directory>
+          AssignUserID {{ username }} {{ username }}
 
           <FilesMatch ".+\.ph(ar|p|tml)$">
               {% if php_version == 8.0 %}
@@ -131,33 +142,39 @@
               {% endif %}
           </FilesMatch>
 
+          <IfModule mod_headers.c>
+              Header always append X-Frame-Options DENY
+              Header set X-Content-Type-Options nosniff
+              Header set X-Permitted-Cross-Domain-Policies "none"
+              Header set Referrer-Policy "same-origin"
+              Header set Cache-Control "no-store"
+              Header set X-XSS-Protection "1; mode=block"
+          </IfModule>
+
           <IfModule mod_setenvif.c>
               SetEnvIf X-Forwarded-Proto "^https$" HTTPS
           </IfModule>
 
-    apache_mods_enabled:
-      - mpm_event
-      - proxy_fcgi
-      - setenvif
-      - rewrite
-      - headers
-      - security2
+          ErrorLog {{ apache_logs_path }}/error.log
+          CustomLog {{ apache_logs_path }}/access.log combined
 
-    apache_mods_disabled:
-      - mpm_prefork
-      - mpm_worker
+    az_devops_agent_role: "deployment"
 
-    apache_packages:
-      - [platform-specific]
-      - libapache2-mod-security2
+    az_devops_agent_user: "{{ username }}"
+
+    az_devops_agent_group: "{{ username }}"
+
+    az_devops_agent_name: "{{ my_az_devops_agent_name }}"
+
+    az_devops_agent_replace_existing: true
+
+    az_devops_accountname: "farisc0de"
 
   roles:
-    - common
-    - devsec.hardening.os_hardening
-    - devsec.hardening.ssh_hardening
-    - geerlingguy.apache
+    - farisc0de.apache
     - geerlingguy.php-versions
     - geerlingguy.php
-    - apache_extra
-    - azuredevops
+    - farisc0de.az_devops
+    - geerlingguy.composer
+    - clonerepo
     - laravel

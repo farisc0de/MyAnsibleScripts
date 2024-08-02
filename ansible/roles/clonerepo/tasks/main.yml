@@ -1,0 +1,43 @@
+---
+# tasks file for clonerepo
+- name: Check if public_html folder exist
+  ansible.builtin.stat:
+    path: "/home/{{ ansible_user }}/{{ git_project_name }}"
+  register: project_folder
+  tags: clonerepo
+
+- name: Remove the project folder
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/{{ git_project_name }}"
+    state: absent
+  when: project_folder.stat.exists
+
+- name: Clone a private repository into ubuntu.
+  ansible.builtin.git:
+    repo: "{{ git_repo }}"
+    version: "{{ git_branch }}"
+    dest: "/home/{{ ansible_user }}/{{ git_project_name }}"
+  tags: clonerepo
+
+- name: Copy the repository to the project folder
+  ansible.builtin.copy:
+    src: "/home/{{ ansible_user }}/{{ git_project_name }}"
+    dest: "{{ apache_root_path }}/"
+    remote_src: true
+    mode: "0755"
+  tags: clonerepo
+
+- name: Remove the source repository folder
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/{{ git_project_name }}"
+    state: absent
+  tags: clonerepo
+
+- name: Change Folder Owner
+  ansible.builtin.file:
+    path: "{{ apache_root_path }}/"
+    state: directory
+    recurse: true
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  tags: clonerepo

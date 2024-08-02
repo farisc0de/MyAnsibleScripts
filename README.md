@@ -22,6 +22,7 @@ This repository contains Ansible playbooks for automating the deployment of vari
 - **Handlers**: Ansible handlers are used for restarting services.
 - **Templates**: Jinja2 templates are used for generating configuration files.
 
+
 ## License
 
 MIT

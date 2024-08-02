@@ -1,9 +1,0 @@
----
-- name: Rewrite MPM_Event
-  become: true
-  ansible.builtin.template:
-    src: mpm.conf.j2
-    dest: /etc/apache2/mods-available/mpm_{{ apache_extra_mpm }}.conf
-    mode: preserve
-  notify: restart_apache
-  tags: apache

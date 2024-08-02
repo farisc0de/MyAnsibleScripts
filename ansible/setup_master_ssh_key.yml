@@ -1,0 +1,18 @@
+- name: Set up master key for Azure DevOps
+  hosts: all
+  tasks:
+    - name: Set Master Public Key
+      ansible.builtin.copy:
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        src: azuredevops.pub
+        dest: /home/{{ ansible_user }}/.ssh/azuredevops.pub
+        mode: "0600"
+
+    - name: Set Master Private Key
+      ansible.builtin.copy:
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        src: azuredevops
+        dest: /home/{{ ansible_user }}/.ssh/azuredevops
+        mode: "0600"

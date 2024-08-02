@@ -1,0 +1,16 @@
+- name: Install Basic Packages
+  hosts: all
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Basic Packages
+      ansible.builtin.apt:
+        pkg:
+          - acl
+          - curl
+          - git
+          - zip
+          - unzip
+        state: present

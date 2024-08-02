@@ -1,4 +1,0 @@
----
-# tasks file for apache
-- name: "Enable MPM Processors"
-  ansible.builtin.include_tasks: rewrite_mpm.yml

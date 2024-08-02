@@ -1,34 +1,18 @@
 ---
 # WordPress Configuration
-- name: Check if folder exist {{ project_name }}
-  ansible.builtin.stat:
-    path: "{{ apache_root_path }}/{{ project_name }}"
-  register: project_folder
-  tags: wordpress
-
-- name: Clone a private repository into {{ project_name }}.
-  become: true
-  become_user: "{{ username }}"
-  ansible.builtin.git:
-    repo: "{{ git_repo }}"
-    version: "{{ git_branch }}"
-    dest: "{{ apache_root_path }}/{{ project_name }}"
-    accept_hostkey: true
-  when: not project_folder.stat.exists
-  tags: wordpress
 
 - name: Download and unpack latest WordPress
   ansible.builtin.unarchive:
     src: https://wordpress.org/latest.tar.gz
-    dest: "{{ apache_root_path }}/{{ project_name }}"
+    dest: "{{ apache_root_path }}/"
     remote_src: true
-    creates: "{{ apache_root_path }}/{{ project_name }}/wordpress"
+    creates: "{{ apache_root_path }}/wordpress"
   tags: wordpress
 
 - name: Rename WordPress to public
   ansible.builtin.file:
-    src: "{{ apache_root_path }}/{{ project_name }}/wordpress"
-    dest: "{{ apache_root_path }}/{{ project_name }}/public"
+    src: "{{ apache_root_path }}/wordpress"
+    dest: "{{ apache_root_path }}/public"
     state: directory
     owner: "{{ username }}"
     group: "{{ username }}"
@@ -37,7 +21,7 @@
 
 - name: Set ownership
   ansible.builtin.file:
-    path: "{{ apache_root_path }}/{{ project_name }}"
+    path: "{{ apache_root_path }}/"
     state: directory
     recurse: true
     owner: "{{ username }}"
@@ -46,7 +30,7 @@
 
 - name: Set permissions for directories
   ansible.builtin.file:
-    path: "{{ apache_root_path }}/{{ project_name }}/public/"
+    path: "{{ apache_root_path }}/public/"
     state: directory
     mode: "0750"
     recurse: true
@@ -54,7 +38,7 @@
 
 - name: Set permissions for files
   ansible.builtin.file:
-    path: "{{ apache_root_path }}/{{ project_name }}/public/"
+    path: "{{ apache_root_path }}/public/"
     state: file
     mode: "0640"
     recurse: true
@@ -62,8 +46,8 @@
 
 - name: Set up wp-config
   ansible.builtin.copy:
-    src: "{{ apache_root_path }}/{{ project_name }}/public/wp-config-sample.php"
-    dest: "{{ apache_root_path }}/{{ project_name }}/public/wp-config.php"
+    src: "{{ apache_root_path }}/public/wp-config-sample.php"
+    dest: "{{ apache_root_path }}/public/wp-config.php"
     remote_src: true
     mode: "0644"
   tags: wordpress

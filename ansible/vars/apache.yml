@@ -1,0 +1,11 @@
+# Apache
+
+apache_root_path: /home/{{ username }}/public_html
+apache_logs_path: /home/{{ username }}/apache_logs
+
+apache_maxclients: 2800
+apache_startservers: 4
+apache_minspareservers: 25
+apache_maxspareservers: 75
+apache_maxrequestworkers: 2800
+apache_maxconnectionsperchild: 1000

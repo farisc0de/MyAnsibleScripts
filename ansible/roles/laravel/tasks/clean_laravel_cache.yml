@@ -1,18 +1,21 @@
 ---
 - name: Clear Routes Cache
-  ansible.builtin.command: php artisan routes:clear
-  register: my_output
-  changed_when: my_output.rc != 0
+  php_artisan:
+    command: route:clear
+    artisan_path: /home/{{ username }}/public_html/artisan
+    working_dir: /home/{{ username }}/public_html
   tags: laravel
 
 - name: Clear Application Cache
-  ansible.builtin.command: php artisan cache:clear
-  register: my_output
-  changed_when: my_output.rc != 0
+  php_artisan:
+    command: cache:clear
+    artisan_path: /home/{{ username }}/public_html/artisan
+    working_dir: /home/{{ username }}/public_html
   tags: laravel
 
 - name: Clear Views Cache
-  ansible.builtin.command: php artisan cache:clear
-  register: my_output
-  changed_when: my_output.rc != 0
+  php_artisan:
+    command: view:clear
+    artisan_path: /home/{{ username }}/public_html/artisan
+    working_dir: /home/{{ username }}/public_html
   tags: laravel

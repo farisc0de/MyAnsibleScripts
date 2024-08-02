@@ -1,0 +1,74 @@
+---
+- name: Install Apache and PHP
+  hosts: all
+
+  vars_files:
+    - vars/apache.yml
+    - vars/php.yml
+
+  vars:
+    php_default_version_debian: "{{ php_version }}"
+
+    php_packages_extra:
+      - php{{ php_version }}-zip
+      - php{{ php_version }}-mysqli
+
+    php_enable_php_fpm: true
+
+    php_fpm_state: started
+
+    php_fpm_enabled_on_boot: true
+
+    php_use_managed_ini: true
+
+    php_memory_limit: "{{ memory_limit }}"
+    php_max_execution_time: "{{ max_execution_time }}"
+    php_file_uploads: "{{ file_uploads }}"
+    php_upload_max_filesize: "{{ upload_max_filesize }}"
+    php_max_file_uploads: "{{ max_file_uploads }}"
+    php_post_max_size: "{{ post_max_size }}"
+    php_allow_url_fopen: "{{ allow_url_fopen }}"
+    php_disable_functions: "{{ disable_functions }}"
+
+    apache_mods_enabled:
+      - mpm_prefork
+      - proxy_fcgi
+      - setenvif
+      - rewrite
+      - headers
+      - security2
+      - mpm_itk
+
+    apache_mods_disabled:
+      - mpm_event
+      - mpm_worker
+
+    apache_packages_extra:
+      - package: libapache2-mod-security2
+        state: present
+      - package: libapache2-mpm-itk
+        state: present
+
+    apache_mpm: true
+
+    apache_mpm_module: prefork
+
+    # Prefork MPM Configuration
+    apache_mpm_config:
+      - name: StartServers
+        value: "{{ apache_startservers }}"
+      - name: MinSpareServers
+        value: "{{ apache_minspareservers }}"
+      - name: MaxSpareServers
+        value: "{{ apache_maxspareservers }}"
+      - name: MaxRequestWorkers
+        value: "{{ apache_maxrequestworkers }}"
+      - name: MaxConnectionsPerChild
+        value: "{{ apache_maxconnectionsperchild }}"
+      - name: MaxClients
+        value: "{{ apache_maxclients }}"
+
+  roles:
+    - farisc0de.apache
+    - geerlingguy.php-versions
+    - geerlingguy.php

@@ -1,0 +1,42 @@
+---
+- name: Reconfigure Azure DevOps Agent with new PAT token
+  hosts: all
+  vars_prompt:
+    - name: "username"
+      prompt: "Enter the username"
+      private: false
+
+    - name: "az_devops_agent_name"
+      prompt: "Enter Azure DevOps the agent name"
+      private: false
+
+    - name: "az_devops_client_id"
+      prompt: "Enter the agent client id"
+      private: true
+
+    - name: "az_devops_tenent_id"
+      prompt: "Enter the agent tenent id"
+      private: true
+
+    - name: "az_devops_client_secret"
+      prompt: "Enter the agent client secret"
+      private: true
+    - name: "az_devops_deployment_group_name"
+      prompt: "Enter the agent deployment group name"
+      private: false
+
+    - name: "az_devops_project_name"
+      prompt: "Enter the agent deployment group project name"
+      private: false
+
+  vars:
+    az_devops_agent_replace_existing: true
+    az_devops_reconfigure_agent: true
+    az_devops_agent_user: "{{ username }}"
+    az_devops_agent_group: "{{ username }}"
+    az_devops_agent_role: "deployment"
+    az_devops_accountname: "farisc0de"
+    az_agent_auth_type: "SP"
+
+  roles:
+    - farisc0de.az_devops

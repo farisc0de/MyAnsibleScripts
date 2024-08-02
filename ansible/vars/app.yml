@@ -1,0 +1,3 @@
+# App
+
+wordpress_logs_path: /home/{{ username }}/wordpress_logs

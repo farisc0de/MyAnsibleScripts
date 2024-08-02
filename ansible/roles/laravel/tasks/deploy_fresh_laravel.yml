@@ -27,9 +27,8 @@
   tags: laravel
 
 - name: Setup laravel
-  ansible.builtin.command: php artisan key:generate
+  ansible.builtin.script: php artisan key:generate
   register: my_output
-  changed_when: my_output.rc != 0
   args:
     chdir: /home/{{ username }}/public_html/{{ project_name }}
   become: true

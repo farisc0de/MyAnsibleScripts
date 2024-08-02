@@ -1,6 +1,6 @@
 ---
 # handlers file for logrotate
-- name: Restart_logrotate
+- name: Restart logrotate
   tags: logrotate
   ansible.builtin.service:
     name: logrotate

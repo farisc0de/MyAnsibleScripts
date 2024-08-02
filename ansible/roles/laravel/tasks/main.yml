@@ -4,3 +4,6 @@
 
 - name: Deploy Laravel
   ansible.builtin.include_tasks: deploy_laravel.yml
+
+- name: Clear Laravel Cache
+  ansible.builtin.include_tasks: clean_laravel_cache.yml

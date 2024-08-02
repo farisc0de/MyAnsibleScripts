@@ -1,0 +1,7 @@
+---
+- name: Bootstrap the server
+  hosts: all
+  roles:
+    - buluma.bootstrap
+    - devsec.hardening.os_hardening
+    - devsec.hardening.ssh_hardening
